@@ -1,0 +1,3 @@
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {I}Components}{1}{}%
+\contentsline {section}{\numberline {II}sequence detector}{1}{}%
