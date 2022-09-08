@@ -1,0 +1,89 @@
+-.include "/home/ganga/m328Pdef.inc"
+
+
+
+ldi r16, 0b00111100          ;OUTPUTS
+out DDRD,r16
+ldi r17, 0b1110 ttyACM0 -b 115200 -U fsm_asgn1.hex ttyACM0 -b 115200 -U fsm_asgn1.hex0000         ;INPUTS
+out DDRB,r17         
+ldi r17,0b11111111   
+out PortD,r17
+ldi r18,0b00000001
+ldi r19,0b00000001
+ldi r20,0b00000001
+ldi r21,0b00000001
+
+;LSR r16
+;LSR r16
+
+sbi DDRB, 5 ;set pin 13 as output pin (DDRB pin 5) ; clock input
+
+AND r19,r17          ;r19=c
+LSR  r17
+AND r20,r17           ;r20=b
+LSR r17
+AND r21,r17           ;r21=a
+LSR r17
+AND r18,r17           ;r18=x
+
+ldi r22,0b00000001
+eor r22,r19           ;r22=c'
+
+ldi r23,0b00000001
+eor r23,r20           ;r23=b'
+
+ldi r23,0b00000001
+eor r23,r21           ;r23=a'
+
+;loop1;
+ ; LSR r18
+  ;dec r24
+  ;brne loop1
+  ;ret r18
+ldi  r25,0b00000001
+;rcall loop1
+
+eor r25,r18           ;r25=x'
+
+mov r0,r25            ;r0=x'        
+mov r1,r23            ;r1=b'
+AND r1,r0             ;r1=b'x'
+
+mov r2,r16           ;r2=c
+AND r2,r0            ;r2=cx'
+OR r2,r1             ;r2=cx'+b'x'     (p)
+
+mov r3,r19            ;r3=c
+AND r3,r18            ;r3=cx
+mov r4,r20            ;r4=b
+AND r4,r22            ;r4=bc'
+OR  r4,r3             ;r4=bc'+cx      (Q)      
+
+mov r5,r22            ;r5=C'
+AND r5,r25            ;r5=C'X'
+mov r6,r22            ;r6=c'
+AND r6,r23            ;r6=b'c'
+OR  r6,r5             ;r6=b'c'+c'x'
+OR r6,r1              ;r6=b'c'+c'x'+b'x'   (R)
+
+
+AND r0,r20            ;r0=bx'
+AND r0,r19            ;r0=bx'c         (y)
+
+
+
+ldi  r16,0b00000000          ;
+mov r16,r0               ;0b0000000y
+lsl r16
+or r16,r6                ;0b000000YR
+lsl r16
+or r16,r4                 ;0b00000YRQ
+lsl r16
+or r1,r2                   ; 0b0000YRQP
+lsl r16
+lsl r16
+
+out PORTD,r16
+
+start:
+rjmp start
